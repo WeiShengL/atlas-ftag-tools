@@ -41,11 +41,15 @@ class Cut:
 
     @property
     def value(self) -> int | float:
+        if self._value == "HadronConeExclTruthLabelID":
+            return self._value
         if isinstance(self._value, str):
             return literal_eval(self._value)
         return self._value
 
     def __call__(self, array):
+        if self.value == "HadronConeExclTruthLabelID":
+            return OPERATORS[self.operator](array[self.variable], array[self.value])
         return OPERATORS[self.operator](array[self.variable], self.value)
 
     def __str__(self) -> str:

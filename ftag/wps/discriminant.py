@@ -62,6 +62,15 @@ def ctag_discriminant(jets, tagger, fb, ftau=0, epsilon=1e-10):
     fxs = {"pb": fb, "ptau": ftau, "pu": 1 - fb - ftau}
     return discriminant(jets, tagger, Flavours.cjets, fxs, epsilon=epsilon)
 
+def ghost_btag_discriminant(jets, tagger, fghostc, fghosttau=0, epsilon=1e-10):
+    fxs = {"pghostc": fghostc, "pghosttau": fghosttau, "pghostu": 1 - fghostc - fghosttau}
+    return discriminant(jets, tagger, Flavours.ghostbjets, fxs, epsilon=epsilon)
+
+
+def ghost_ctag_discriminant(jets, tagger, fghostb, fghosttau=0, epsilon=1e-10):
+    fxs = {"pghostb": fghostb, "pghosttau": fghosttau, "pghostu": 1 - fghostb - fghosttau}
+    return discriminant(jets, tagger, Flavours.ghostcjets, fxs, epsilon=epsilon)
+
 
 def hbb_discriminant(jets, tagger, ftop=0.25, fhcc=0.02, epsilon=1e-10):
     fxs = {"phcc": fhcc, "ptop": ftop, "pqcd": 1 - ftop - fhcc}
@@ -99,6 +108,8 @@ def get_discriminant(
     tagger_funcs: dict[str, Callable] = {
         "bjets": btag_discriminant,
         "cjets": ctag_discriminant,
+        "ghostbjets": ghost_btag_discriminant,
+        "ghostcjets": ghost_ctag_discriminant,
         "hbb": hbb_discriminant,
         "hcc": hcc_discriminant,
     }
