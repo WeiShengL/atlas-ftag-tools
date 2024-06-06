@@ -13,6 +13,7 @@ def discriminant(
     signal: Flavour,
     fxs: dict[str, float],
     epsilon: float = 1e-10,
+    ghost: bool = False,
 ) -> np.ndarray:
     """
     Get the tagging discriminant.
@@ -50,12 +51,18 @@ def discriminant(
         if fx > 0 and name not in jets.dtype.names:
             raise ValueError(f"Nonzero fx for {d}, but '{name}' not found in input array.")
         denominator += jets[name] * fx if name in jets.dtype.names else 0
+    if ghost:
+        return np.log((jets[f"{tagger}_pghost{signal.px[1:]}jets"] + epsilon) / (denominator + epsilon))
     return np.log((jets[f"{tagger}_{signal.px}"] + epsilon) / (denominator + epsilon))
 
 
-def btag_discriminant(jets, tagger, fc, ftau=0, epsilon=1e-10):
-    fxs = {"pc": fc, "ptau": ftau, "pu": 1 - fc - ftau}
-    return discriminant(jets, tagger, Flavours.bjets, fxs, epsilon=epsilon)
+
+def btag_discriminant(jets, tagger, fc, ftau=0, epsilon=1e-10, ghost=False):
+    if ghost:
+        fxs = {"pghostcjets": fc, "pghosttaujets": ftau, "pghostujets": 1 - fc - ftau}
+    else:
+        fxs = {"pc": fc, "ptau": ftau, "pu": 1 - fc - ftau}
+    return discriminant(jets, tagger, Flavours.bjets, fxs, epsilon=epsilon, ghost=ghost)
 
 
 def ctag_discriminant(jets, tagger, fb, ftau=0, epsilon=1e-10):
@@ -74,7 +81,7 @@ def hcc_discriminant(jets, tagger, ftop=0.25, fhbb=0.3, epsilon=1e-10):
 
 
 def get_discriminant(
-    jets: np.ndarray, tagger: str, signal: Flavour | str, epsilon: float = 1e-10, **fxs
+    jets: np.ndarray, tagger: str, signal: Flavour | str, ghost: bool, epsilon: float = 1e-10, **fxs
 ):
     """Calculate the b-tag or c-tag discriminant for a given tagger.
 
@@ -107,4 +114,4 @@ def get_discriminant(
         raise ValueError(f"Signal flavour must be one of {list(tagger_funcs.keys())}, not {signal}")
 
     func: Callable = tagger_funcs[str(Flavours[signal])]
-    return func(jets, tagger, **fxs, epsilon=epsilon)
+    return func(jets, tagger, **fxs, epsilon=epsilon, ghost=ghost)
