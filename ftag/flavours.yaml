@@ -244,3 +244,20 @@
   cuts: ["iffClass == 0"]
   colour: tab:gray
   category: isolation
+
+# single b-tagging
+- name: fcc_bjets
+  label: $b$-jets
+  cuts: ["flavour == 5"]
+  colour: tab:blue
+  category: single-btag-fcc
+- name: fcc_cjets
+  label: $c$-jets
+  cuts: ["flavour == 4"]
+  colour: tab:orange
+  category: single-btag-fcc
+- name: fcc_ujets
+  label: Light-jets
+  cuts: ["flavour == 0"]
+  colour: tab:green
+  category: single-btag-fcc
