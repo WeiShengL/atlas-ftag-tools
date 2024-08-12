@@ -59,6 +59,9 @@ def discriminant(
     return np.log((jets[f"{tagger}_{signal.px}"] + epsilon) / (denominator + epsilon))
 
 
+def tautag_dicriminant(jets, tagger, fb, fc, epsilon=1e-10):
+    fxs = {"pb": fb, "pc": fc, "pu": 1 - fb - fc}
+    return discriminant(jets, tagger, Flavours.taujets, fxs, epsilon=epsilon)
 
 def btag_discriminant(jets, tagger, fc, ftau=0, epsilon=1e-10, ghost=False, fcc=False):
     if ghost:
@@ -111,6 +114,7 @@ def get_discriminant(
     tagger_funcs: dict[str, Callable] = {
         "bjets": btag_discriminant,
         "cjets": ctag_discriminant,
+        "taujets": tautag_dicriminant,
         "hbb": hbb_discriminant,
         "hcc": hcc_discriminant,
     }
