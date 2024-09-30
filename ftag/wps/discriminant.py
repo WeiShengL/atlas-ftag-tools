@@ -53,9 +53,11 @@ def discriminant(
             raise ValueError(f"Nonzero fx for {d}, but '{name}' not found in input array.")
         denominator += jets[name] * fx if name in jets.dtype.names else 0
     if ghost:
-        return np.log((jets[f"{tagger}_pghost{signal.px[1:]}jets"] + epsilon) / (denominator + epsilon))
+        return np.log((jets[f"{tagger}_pghost{signal.px[1:]}"] + epsilon) / (denominator + epsilon))
     if fcc:
-        return np.log((jets[f"{tagger}_pfcc_{signal.px[1:]}jets"] + epsilon) / (denominator + epsilon))
+        return np.log(
+            (jets[f"{tagger}_pfcc_{signal.px[1:]}jets"] + epsilon) / (denominator + epsilon)
+        )
     return np.log((jets[f"{tagger}_{signal.px}"] + epsilon) / (denominator + epsilon))
 
 
@@ -63,9 +65,10 @@ def tautag_dicriminant(jets, tagger, fb, fc, epsilon=1e-10):
     fxs = {"pb": fb, "pc": fc, "pu": 1 - fb - fc}
     return discriminant(jets, tagger, Flavours.taujets, fxs, epsilon=epsilon)
 
+
 def btag_discriminant(jets, tagger, fc, ftau=0, epsilon=1e-10, ghost=False, fcc=False):
     if ghost:
-        fxs = {"pghostcjets": fc, "pghosttaujets": ftau, "pghostujets": 1 - fc - ftau}
+        fxs = {"pghostc": fc, "pghosttau": ftau, "pghostu": 1 - fc - ftau}
     elif fcc:
         fxs = {"pfcc_cjets": fc, "pfcc_taujets": ftau, "pfcc_ujets": 1 - fc - ftau}
     else:
@@ -89,7 +92,13 @@ def hcc_discriminant(jets, tagger, ftop=0.25, fhbb=0.3, epsilon=1e-10):
 
 
 def get_discriminant(
-    jets: np.ndarray, tagger: str, signal: Flavour | str, ghost: bool, fcc: bool, epsilon: float = 1e-10, **fxs
+    jets: np.ndarray,
+    tagger: str,
+    signal: Flavour | str,
+    ghost: bool,
+    fcc: bool,
+    epsilon: float = 1e-10,
+    **fxs,
 ):
     """Calculate the b-tag or c-tag discriminant for a given tagger.
 
